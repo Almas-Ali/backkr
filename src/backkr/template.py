@@ -1,22 +1,44 @@
+import os
+
+
 class Template:
     def __init__(self):
-        pass
+        self.template_dir: str = './'
 
-    def render_template(template, **kwargs):
-        with open(template, "r") as f:
-            template = f.read()
+    def set_template_dir(self, template_dir):
+        '''This method is used to set the template directory'''
+
+        self.template_dir = template_dir
+
+    def render_template(self, template, **kwargs):
+        '''This method is used to render a template file'''
+        print(os.path.join(self.template_dir, template))
+
+        try:
+            with open(os.path.join(self.template_dir, template), 'r') as f:
+                template = f.read()
+            for key, value in kwargs.items():
+                template = template.replace("{{ " + key + " }}", value)
+            return template
+        except FileNotFoundError:
+            self.Error404()
+
+    def render_string(self, template, **kwargs):
+        '''This method is used to render a python template string'''
+
         for key, value in kwargs.items():
             template = template.replace("{{ " + key + " }}", value)
         return template
 
-    def render_string(template, **kwargs):
-        for key, value in kwargs.items():
-            template = template.replace("{{ " + key + " }}", value)
-        return template
-    
     def render_component(self, template, **kwargs):
         '''This method is used to render a python template string'''
         return template
+
+    def Error404(self):
+        return "404 Not Found"
+
+    def Error500(self):
+        return "500 Internal Server Error"
 
     def __str__(self):
         return "<Template object>"
