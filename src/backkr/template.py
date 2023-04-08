@@ -12,7 +12,7 @@ class Template:
 
     def render_template(self, template, **kwargs):
         '''This method is used to render a template file'''
-        print(os.path.join(self.template_dir, template))
+        # print(os.path.join(self.template_dir, template))
 
         try:
             with open(os.path.join(self.template_dir, template), 'r') as f:
@@ -35,10 +35,16 @@ class Template:
         return template
 
     def Error404(self):
-        return "404 Not Found"
+        return "<h1>404 Not Found</h1>"
 
     def Error500(self):
-        return "500 Internal Server Error"
+        return "<h1>500 Internal Server Error</h1>"
+    
+    def ErrorWithResponse(self, response):
+        return f'''\
+<h1>500 Internal Server Error</h1>
+<p>{response}</p>
+'''
 
     def __str__(self):
         return "<Template object>"
