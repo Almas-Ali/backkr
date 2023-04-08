@@ -2,10 +2,13 @@
 
 Created by [**@Almas-Ali**](https://github.com/Almas-Ali)
 
-## Documentation
+## Table of Contents
 
-[Website](https://almas-ali.github.io/backkr/)
-
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Documentation](#documentation)
+- [License](#license)
 
 ## Introduction
 
@@ -41,3 +44,12 @@ def index(request):
 if __name__ == "__main__":
     app.run(debug=True)
 ```
+
+
+## Documentation
+
+[Website](https://almas-ali.github.io/backkr/)
+
+## LICENSE
+
+Licensed under the [**MIT LICENSE**](https://github.com/Almas-Ali/backkr/tree/master/LICENSE)
