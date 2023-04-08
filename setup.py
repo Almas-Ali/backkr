@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='backkr',
-    version='0.0.1',
+    version='0.0.2',
     description='A backend framework the web',
     long_description_content_type="text/markdown",
     long_description=long_description,
