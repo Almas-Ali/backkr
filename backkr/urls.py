@@ -1,7 +1,7 @@
 from typing import Dict, Any, Callable
 import urllib.parse
 import http.client
-
+from backkr.template import Template
 
 class Router:
     def __init__(self) -> None:
@@ -52,7 +52,7 @@ class Request:
     @property
     def headers(self) -> Dict[str, Any]:
         return self.environ
-    
+
     @property
     def cookies(self) -> Dict[str, Any]:
         return self.environ.get('HTTP_COOKIE', '')
@@ -74,19 +74,23 @@ class Request:
 
 
 class Response:
-    def __init__(self, status: int = 200, content_type: str = 'text/html'):
+    def __init__(self, res: str = None, status: int = 200, content_type: str = 'text/html'):
         self.status = status
         self.content_type = content_type
         self.headers = []
+        self.res = res
 
     def set_header(self, key: str, value: str):
         self.headers.append((key, value))
 
-    def set_cookie(self, key: str, value: str, max_age: int = 3600):
+    def set_cookie(self, key: str, value: str, expires: int = None, max_age: int = 3600, domain: str = None, secure: bool = False, httponly: bool = True):
         self.set_header(
-            'Set-Cookie', f'{key}={value}; Max-Age={max_age}; HttpOnly; Path=/')
+            'Set-Cookie', f'{key}={value}; Max-Age={max_age}; Path=/; HttpOnly={httponly}; Secure={secure}; Domain={domain}; Expires={expires}')
 
     def __call__(self, environ: Dict[str, Any], start_response):
         start_response(f'{self.status} {http.client.responses.get(self.status)}', [
                        ('Content-Type', self.content_type)] + self.headers)
         return []
+
+    def __str__(self):
+        return Template().render_string(self.res)

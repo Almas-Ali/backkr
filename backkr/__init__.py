@@ -6,8 +6,6 @@ from http import HTTPStatus
 import traceback
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from backkr.http import Autoload
-from dataclasses import dataclass
 from typing import Callable, Dict, Any, List
 import os
 import sys
@@ -15,8 +13,6 @@ import time
 
 from wsgiref.simple_server import make_server
 import threading
-
-import logging
 
 
 # class Server:
@@ -104,10 +100,12 @@ class ServerX:
                 response = template.ErrorWithResponse(response=str(TE))
             else:
                 response = template.Error500()
-
+        #################################################################
+        print(type(response.res)) # TODO: Need to resolve the 500 Error here!
         start_response('200 OK', [('Content-type', 'text/html')])
         # print(f'path: {path}, request: {request}, response: {response}')
         return [bytes(response, 'utf-8')]
+        ##################################################################
 
     def application(environ, start_response):
         """
@@ -126,7 +124,8 @@ class ServerX:
         """
         print('Reloading server...\n')
         time.sleep(1)  # Give time for previous connections to close.
-        os.execv(sys.executable, [sys.executable] + sys.argv) # Restart the server.
+        # Restart the server.
+        os.execv(sys.executable, [sys.executable] + sys.argv)
 
     def check_file_changes(self):
         """
