@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='backkr',
-    version='0.0.3',
+    version='0.0.4',
     description='A backend framework the web',
     long_description_content_type="text/markdown",
     long_description=long_description,
@@ -25,7 +25,10 @@ setup(
     ],
     keywords='web framework',
     python_requires='>=3.10',
-
+    install_requires=[
+        'aiohttp',
+        'watchdog',
+    ],
     entry_points={
         'console_scripts': [
             'backkr=backkr.cli:main',
