@@ -1,4 +1,7 @@
+import asyncio
 import os
+
+from aiohttp import web
 
 
 class Template:
@@ -39,7 +42,7 @@ class Template:
 
     def Error500(self):
         return "<h1>500 Internal Server Error</h1>"
-    
+
     def ErrorWithResponse(self, response):
         return f'''\
 <h1>500 Internal Server Error</h1>
@@ -54,3 +57,30 @@ class Template:
 
     def __call__(self):
         return self
+
+
+def HTMLResponse(template: str, **kwargs):
+    html = Template().render_string(template=template, **kwargs)
+    return web.Response(
+        text=html,
+        content_type='text/html'
+    )
+
+
+def JSONResponse(json: dict):
+    return web.json_response(json)
+
+
+def TemplateResponse(template: str, dir: str = 'templates/', **kwargs):
+    html = Template().render_template(
+        template=os.path.join(dir, template),
+        **kwargs
+    )
+    return web.Response(
+        text=html,
+        content_type='text/html'
+    )
+
+
+def Redirect(url: str):
+    return web.HTTPFound(url)
