@@ -23,28 +23,41 @@ pip install backkr
 ## Usage
 
 ```python
-from backkr import Backkr
-from backkr.template import Template
 from datetime import datetime
 
-app = Backkr(__name__)
+from backkr import (
+    Backkr,
+    HTMLResponse
+)
 
-template = Template()
-template.set_template_dir('templates')
+app = Backkr()
 
-
-@app.route('/', methods=['GET', 'POST'])
-def index(request):
-    return template.render_string(
+@app.get('/')
+async def index(request):
+    return HTMLResponse(
         '<h1>Hello World, Time: {{ time }}</h1>',
         time=datetime.now().strftime("%H:%M:%S")
     )
 
+@app.get('/{path}')
+async def error_404(request):
+    path = request.match_info.get('path')
+    return HTMLResponse(f'''\
+<center>
+    <h1>404 Not Found</h1>
+    <p>Page /{path} not found</p>
+</center>
+''')
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
-```
+    app.run(
+        debug=True,
+        host='127.0.0.1',
+        port=8000
+    )
 
+```
 
 ## Documentation
 
