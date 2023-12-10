@@ -5,3 +5,4 @@ __pycache__
 
 src/app.py
 src/templates
+.venv
