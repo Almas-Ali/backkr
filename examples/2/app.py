@@ -1,10 +1,10 @@
-from fronty import Fronty
-from fronty.urls import Router
+from backkr import Backkr
+from backkr.urls import Router
 
 # Components
 from components.index import home
 
-app = Fronty(__name__)
+app = Backkr(__name__)
 router = Router()
 # app.router = router
 
