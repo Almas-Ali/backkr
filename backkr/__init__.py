@@ -1,8 +1,8 @@
-from typing import Any, Callable, List
 import asyncio
 import time
 import os
 import sys
+from typing import Any, Callable, List, Dict
 
 from aiohttp import web
 from watchdog.observers import Observer
@@ -16,9 +16,11 @@ from backkr.template import (
     TemplateResponse,
     Redirect,
 )
-
+from backkr.logger import Logger, LogLevel, RouteLogger
 
 __version__ = '0.0.4'
+
+logger = Logger(level=LogLevel.DEBUG)
 
 
 class FileSystemWatcher(FileSystemEventHandler):
@@ -27,32 +29,44 @@ class FileSystemWatcher(FileSystemEventHandler):
 
     def on_modified(self, event):
         if event.src_path.endswith('.py'):
-            print(f'File {event.src_path} has been modified')
-            print('Reloading server...\n')
+            logger.debug(f'File {event.src_path} has been modified')
+            logger.debug('Reloading server...')
             time.sleep(1)  # Give time for previous connections to close.
             # Restart the server.
+            logger.debug('Server restarted')
             os.execv(sys.executable, [sys.executable] + sys.argv)
-            print('Server reloaded successfully')
 
 
 class Backkr:
     def __init__(self):
         self.app = web.Application()
-        self.routes: list = []
-        self.host = "127.0.0.1"
-        self.port = 8000
-        self.debug = False
-        self.options = {}
+        self.routes: List[web.RouteDef] = []
+        self.host: str = "127.0.0.1"
+        self.port: int = 8000
+        self.debug: bool = False
+        self.options: Dict[str, Any] = {}
 
     def get(self, path: str):
         def wrapper(func: Callable) -> Callable:
-            self.routes.append(web.get(path, func))
+            self.routes.append(
+                web.get(
+                    path=path,
+                    handler=func,
+                    name=func.__name__,
+                )
+            )
             return func
         return wrapper
 
     def post(self, path: str):
         def wrapper(func: Callable) -> Callable:
-            self.routes.append(web.post(path, func))
+            self.routes.append(
+                web.post(
+                    path=path,
+                    handler=func,
+                    name=func.__name__,
+                )
+            )
             return func
         return wrapper
 
@@ -67,7 +81,7 @@ class Backkr:
         '''This method is used to run the web server'''
         self.app.add_routes(self.routes)
 
-        runner = web.AppRunner(self.app)
+        runner = web.AppRunner(self.app, access_log_class=RouteLogger)
         await runner.setup()
 
         site = web.TCPSite(runner, self.host, self.port)
@@ -86,12 +100,14 @@ class Backkr:
         loop = asyncio.get_event_loop()
         loop.create_task(self._run_web_server())
 
-    def run(self,
-            debug: bool = False,
-            host: str = "127.0.0.1",
-            port: int = 8000,
-            **options: Any,
-            ) -> None:
+    def run(
+        self,
+        *,
+        debug: bool = False,
+        host: str = "127.0.0.1",
+        port: int = 8000,
+        **options: Any,
+    ) -> None:
 
         self.host = host
         self.port = port
@@ -109,7 +125,7 @@ class Backkr:
             loop.run_until_complete(self.run_other_task())
             loop.run_forever()
         except KeyboardInterrupt:
-            print('\nServer stopped')
+            logger.warn('KeyboardInterrupt. Stopping server...')
             observer.stop()
         finally:
             observer.join()
