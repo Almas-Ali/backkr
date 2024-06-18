@@ -14,7 +14,7 @@ setup(
     url='https://github.com/Almas-Ali/backkr',
     packages=find_packages(),
     classifiers=[
-        'Development Status :: 2 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.7',
@@ -26,8 +26,9 @@ setup(
     keywords='web framework',
     python_requires='>=3.10',
     install_requires=[
-        'aiohttp',
-        'watchdog',
+        'aiohttp[speedups]==3.9.5',
+        'rong==0.0.3',
+        'watchdog==4.0.1',
     ],
     entry_points={
         'console_scripts': [
