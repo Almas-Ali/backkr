@@ -1,30 +1,34 @@
-import asyncio
+from typing import Any, Dict
 import os
 
 from aiohttp import web
 
+from backkr.logger import Logger, LogLevel
+
+logger = Logger(level=LogLevel.DEBUG)
+
 
 class Template:
-    def __init__(self):
+    def __init__(self) -> None:
         self.template_dir: str = './'
 
-    def set_template_dir(self, template_dir):
+    def set_template_dir(self, template_dir: str) -> None:
         '''This method is used to set the template directory'''
 
         self.template_dir = template_dir
 
-    def render_template(self, template, **kwargs):
+    def render_template(self, template: str, **kwargs: Dict[Any, Any]) -> str:
         '''This method is used to render a template file'''
         # print(os.path.join(self.template_dir, template))
 
         try:
             with open(os.path.join(self.template_dir, template), 'r') as f:
-                template = f.read()
+                _template = f.read()
             for key, value in kwargs.items():
-                template = template.replace("{{ " + key + " }}", value)
-            return template
+                _template = _template.replace("{{ " + key + " }}", value)
+            return _template
         except FileNotFoundError:
-            self.Error404()
+            return self.Error404()
 
     def render_string(self, template, **kwargs):
         '''This method is used to render a python template string'''
@@ -38,9 +42,11 @@ class Template:
         return template
 
     def Error404(self):
+        logger.error('404 Not Found')
         return "<h1>404 Not Found</h1>"
 
     def Error500(self):
+        logger.error('500 Internal Server Error')
         return "<h1>500 Internal Server Error</h1>"
 
     def ErrorWithResponse(self, response):
@@ -71,7 +77,7 @@ def JSONResponse(json: dict):
     return web.json_response(json)
 
 
-def TemplateResponse(template: str, dir: str = 'templates/', **kwargs):
+def TemplateResponse(template: str, dir: str = 'templates/', **kwargs: Dict[Any, Any]) -> web.Response:
     html = Template().render_template(
         template=os.path.join(dir, template),
         **kwargs
