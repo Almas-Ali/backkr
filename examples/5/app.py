@@ -18,7 +18,6 @@ async def index(request):
 
 @app.get('/about')
 async def about(request):
-    print('No about found\nRedirecting to home')
     return Redirect('/')
 
 
