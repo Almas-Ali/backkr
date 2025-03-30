@@ -8,6 +8,7 @@ from aiohttp import web
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+from backkr import middlewares
 from backkr.urls import Router, Request, Response
 from backkr.template import (
     Template,
@@ -39,8 +40,9 @@ class FileSystemWatcher(FileSystemEventHandler):
 
 class Backkr:
     def __init__(self):
-        self.app = web.Application()
+        self.app = web.Application
         self.routes: List[web.RouteDef] = []
+        self.middlewares: List[web.middleware] = []
         self.host: str = "127.0.0.1"
         self.port: int = 8000
         self.debug: bool = False
@@ -70,18 +72,28 @@ class Backkr:
             return func
         return wrapper
 
-    async def middleware(self, request: Request, handler: Callable) -> Response:
-        '''This method is used to handle middleware'''
-        return await handler(request)
+    # async def middleware(self, request: Request, handler: Callable) -> Response:
+    #     '''This method is used to handle middleware'''
+    #     return await handler(request)
+
+    # def middleware(self) -> None:
+    #     def wrapper(func):
+    #         self.middlewares.append(func)
+    #     return wrapper
+
 
     def _get_time_stamp(self):
         return time.strftime("%H:%M:%S", time.localtime())
 
     async def _run_web_server(self):
         '''This method is used to run the web server'''
+        self.app = self.app(middlewares=self.middlewares)
         self.app.add_routes(self.routes)
 
-        runner = web.AppRunner(self.app, access_log_class=RouteLogger)
+        runner = web.AppRunner(
+            self.app,
+            access_log_class=RouteLogger
+        )
         await runner.setup()
 
         site = web.TCPSite(runner, self.host, self.port)

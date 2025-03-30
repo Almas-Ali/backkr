@@ -9,6 +9,13 @@ import datetime
 
 app = Backkr()
 
+@app.middleware()
+async def middleware(request, handler):
+    print('Middleware called')
+    response = await handler(request)
+    print('Middleware finished')
+    return response
+
 
 @app.get('/')
 async def index(request):
